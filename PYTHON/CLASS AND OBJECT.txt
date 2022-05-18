@@ -1,0 +1,39 @@
+#CLASS AND OBJECTS#
+class customer_class:
+    def __init__(self,email,phone):
+        print("email=",email)
+        print("phone=",phone)
+    def place_order(self):
+        item=input("enter the item ")
+        print("your item ordered succssfully")
+    def cancel_order(self):
+        item=input("enter the item")
+        print("your item canceled successfully")
+
+#calling object
+sam_object = customer_class('abc@gmail.com',92833483264)
+
+sam_object.place_order()
+
+sam_object.cancel_order()
+
+class customer_class:
+    def __init__(self,email,phone):
+        emails =[]
+        emails.append(email)
+        print(emails)
+        print("email=",email)
+        print("phone=",phone)
+    def place_order(self):
+        item=input("enter the item ")
+        print("your item ordered succssfully")
+    def cancel_order(self):
+        item=input("enter the item")
+        print("your item canceled successfully")
+
+obj_name = customer_class('abc@gmail.com',9227463274)
+obj_name = customer_class('bgd@gmail.com',9764733362)
+
+
+
+
