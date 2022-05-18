@@ -1,0 +1,49 @@
+Create table source_data
+(st_id number(5),
+St_name varchar2(20),
+Marks number(5));
+
+
+insert into source_data values(100,'ram',45);
+insert into source_data values(101,'tim',85);
+insert into source_data values(102,'bala',95);
+
+Create table target_data
+(st_id number(5),
+St_name varchar2(20),
+Marks number(5),
+Top_marks number(5),
+Least_marks number(5),
+Varience_from_lowest number(5),
+Varience_from_highest number(5));
+
+SELECT * FROM SOURCE_DATA;
+SELECT * FROM TARGET_DATA;
+
+
+---If you run the program again, you should ignore the records which are already exists 
+    in the target. Write a stored procedure to populate the target tables.---
+CREATE OR REPLACE PROCEDURE VAR_POP AS
+CURSOR VAR_P IS (SELECT ST_ID,ST_NAME,MARKS
+                FROM SOURCE_DATA);
+PAT NUMBER(2);
+BEGIN
+FOR I IN VAR_P LOOP
+SELECT COUNT(*) INTO PAT 
+FROM TARGET_DATA
+WHERE ST_ID=I.ST_ID AND ST_NAME=I.ST_NAME AND MARKS=I.MARKS;
+
+IF PAT=0 THEN
+INSERT INTO TARGET_DATA VALUES(I.ST_ID,I.ST_NAME,I.MARKS,(SELECT MAX(MARKS)FROM SOURCE_DATA),
+(SELECT MIN(MARKS)FROM SOURCE_DATA),(SELECT I.MARKS-MIN(MARKS) FROM SOURCE_DATA),
+(SELECT I.marks - MAX(MARKS) FROM SOURCE_DATA));
+
+ELSE 
+DBMS_OUTPUT.PUT_LINE('ALREADY EXITS');
+END IF;
+END LOOP;
+END;
+
+TRUNCATE TABLE TARGET_DATA;
+EXEC VAR_POP;
+COMMIT;

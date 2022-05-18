@@ -1,0 +1,72 @@
+Create table CUSTOMER_DUP
+(cust_name varchar2(20),
+Cust_phone number(10),
+Cust_city varchar2(20),
+Cust_since date
+)
+
+
+Create table cust_unique
+(cust_name varchar2(20),
+Cust_phone number(10),
+Cust_city varchar2(20),
+Cust_since date); 
+
+
+
+Create table cust_duplicate
+(cust_name varchar2(20),
+Cust_phone number(10),
+Cust_city varchar2(20),
+Cust_since date,
+No_of_instances number(4)
+)
+
+insert into CUSTOMER_DUP values('raj',12345,'blr','21-jan-19');
+insert into CUSTOMER_DUP values('kiran',989734,'hyd','19-mar-18');
+insert into CUSTOMER_DUP values('kimm',878384,'chn','29-apr-19');
+insert into CUSTOMER_DUP values('arun',892393,'del','23-aug-18');
+insert into CUSTOMER_DUP values('arun',892393,'del','23-aug-18');
+insert into CUSTOMER_DUP values('rajesh',783738,'blr','31-jan-18');
+insert into CUSTOMER_DUP values('arun',892393,'del','23-aug-18');
+
+
+
+
+--TO SEPARATE DUPLIACTE RECORDS INTO ONE AND ANOTHER TABLE--
+CREATE OR REPLACE PROCEDURE CUST_DUP AS
+CURSOR CUR_UNIQUE IS (SELECT CUST_NAME,CUST_PHONE,CUST_CITY,CUST_SINCE FROM CUSTOMER_DUP
+WHERE ROWID IN (SELECT MAX(ROWID) FROM CUSTOMER_DUP
+             GROUP BY CUST_NAME,CUST_PHONE,CUST_CITY,CUST_SINCE));
+
+CURSOR CUR_DUPLICATE IS (SELECT CUST_NAME,CUST_PHONE,CUST_CITY,CUST_SINCE,COUNT(*) AS CNT
+                        FROM CUSTOMER_DUP
+                        GROUP BY CUST_NAME,CUST_PHONE,CUST_CITY,CUST_SINCE
+                        HAVING COUNT(*)>1);
+
+
+BEGIN
+FOR I IN CUR_UNIQUE LOOP
+        INSERT INTO CUST_UNIQUE VALUES(I.CUST_NAME,I.CUST_PHONE,I.CUST_CITY,I.CUST_SINCE);
+END LOOP;
+FOR I IN CUR_DUPLICATE LOOP
+        INSERT INTO cust_duplicate VALUES(I.CUST_NAME,I.CUST_PHONE,I.CUST_CITY,I.CUST_SINCE,I.CNT);
+END LOOP;
+END;
+
+SET SERVEROUTPUT ON;
+EXEC CUST_DUP;
+SELECT * FROM CUST_UNIQUE;
+SELECT * FROM cust_duplicate;
+
+COMMIT;
+
+
+SELECT * FROM CUSTOMER_DUP;
+INSERT INTO CUSTOMER_DUP VALUES('raj',8765,'CHENNAI','20-01-20');
+
+--TOO DISPLAY DUPLICATE RECORDS--
+SELECT CUST_NAME,COUNT(*),CUST_PHONE,CUST_CITY,CUST_SINCE
+FROM CUSTOMER_DUP
+GROUP BY CUST_NAME,CUST_PHONE,CUST_CITY,CUST_SINCE
+HAVING COUNT(*)>1;
