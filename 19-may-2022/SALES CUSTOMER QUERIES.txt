@@ -1,0 +1,80 @@
+----SALES AND CUSTOMER--
+UPDATE  SALES_RETAIL  SET SALES_DATE='18-05-2022' WHERE SALES_ID=15;
+SELECT * FROM CUSTOMER_RETAIL;
+SELECT * FROM SALES_RETAIL;
+--1.Find all the customers who did not make any sales from last two months.--
+SELECT CUST_NAME
+FROM CUSTOMER_RETAIL
+WHERE CUST_ID NOT  IN (SELECT CUST_ID FROM SALES_RETAIL
+                        WHERE TO_CHAR(SALES_DATE,'MM')IN 
+                        (TO_CHAR(SYSDATE,'MM')-1, TO_CHAR(SALES_DATE,'MM')));
+
+
+SELECT TO_CHAR(SYSDATE,'MM')-2 FROM DUAL;
+SELECT ADD_MONTHS(TRUNC(SYSDATE,'MM'),-1) FROM DUAL; 
+SELECT TRUNC(SYSDATE,'YY')-1 FROM DUAL;  
+
+
+
+
+
+2.	Find top 10 customers in terms of sales in the current year
+SELECT CUST_NAME,SALES_ID
+FROM (SELECT CUST_NAME,AMOUNT
+        DENSE_RANK() OVER (ORDER BY SALES_ID DESC)AS RNK
+        FROM CUSTOMER_RETAIL C,SALES_RETAIL S
+        WHERE C.CUST_ID = S.CUST_ID
+        GROUP BY AMOUNT)R
+WHERE RNK<10;
+      
+      
+
+3.	How many different cities from which we have our customers
+SELECT COUNT(CUST_NAME),CUST_CITY
+FROM CUSTOMER_RETAIL C
+GROUP BY CUST_CITY;
+
+4.	Find customers who are from the same city as Customer ‘TIM’
+SELECT cust_name
+FROM CUSTOMER_RETAIL
+WHERE cust_name not in 'tim' and cust_city = 
+    (select cust_city from customer_retail
+    where cust_name='tim');
+5.	Find how many different customers we got yesterday
+select to_char(sysdate,'dd') from dual;
+
+SELECT COUNT(CUST_ID)FROM CUSTOMER_RETAIL
+WHERE CUST_ID IN (SELECT CUST_ID FROM SALES_RETAIL
+                    WHERE (to_char(SYSDATE,'dd')-1) in (to_char(SALES_DATE,'dd')));
+6.	Find the date in the current month which gave the least total sales amount. 
+        For example on 1-Jan-13 we sold for 3000 Rs, and on 2-Jan-13 we sold total of 8000 
+        (In this case the answer should be 1-Jan-13)
+
+
+7.	Create a view which gives Customer_Name, Month and total revenue we got
+
+8.	Create a view which gives customer_name, city, year, revenue we got
+9.	Create an index (non cluster index) on cust_nm column in Customer table
+10.	Find the customer who has most number of transactions.
+select * from transaction;
+select * from cust_transaction;
+select * from accountss;
+11.	Display the citywise current year YTD and previous year YTD.
+City_name	Current_YTD	   Prev_YTD
+12.	Display cities that have more number of customers than the city ‘HYD’.
+SELECT COUNT(CUST_ID),cust_city 
+FROM CUSTOMER_RETAIL
+group by cust_city
+having COUNT(CUST_ID)>(SELECT COUNT(CUST_ID)
+                        FROM CUSTOMER_RETAIL
+                        where cust_city='mysore');
+13.	Display citywise number of customers and number of transactions in the current year.
+14.	Display the customers who made sales yesterday and today.
+15.	Display the cities whose number of customers ids more than the number of customers in city ‘Chennai’.
+16.	Write a query to get the output
+Display the customers and their status as ‘Made sales’ or ‘No sales’ in the current year.
+Cust_name	Status
+A		Made sales
+B		Made sales
+C		Nosales
+17. Display the top 1 customer based on sales in every year.
