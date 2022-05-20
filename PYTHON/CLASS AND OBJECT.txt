@@ -35,5 +35,17 @@ obj_name = customer_class('abc@gmail.com',9227463274)
 obj_name = customer_class('bgd@gmail.com',9764733362)
 
 
-
+class customer:
+    def __init__(self,email,phone):
+        print(email)
+        print(phone)
+    def p_order(cls):
+        item=input("enter how many item to place order")
+        print(item)
+    def c_order(self):
+        item=input("enter how many item to cancel order")
+        print(item)
+ob =customer('m@gmail.com','9874563210')
+ob.p_order()
+ob.c_order()
 
