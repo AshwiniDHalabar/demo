@@ -1,0 +1,57 @@
+--1.	Write a query to list the cities which have more population than Bangalore.
+SELECT * FROM CITYY;
+SELECT * FROM BRANCH;
+
+SELECT CITY_NAME FROM CITYY
+WHERE CITY_POPulation > (SELECT CITY_POPulation FROM CITYY WHERE CITY_NAME='bangalore');
+
+-2.	Display all the branch names from Chennai.
+SELECT B_NAME 
+FROM BRANCH 
+WHERE CITY_ID = (SELECT CITY_ID FROM CITYY WHERE CITY_NAME='chennai');
+
+3.	Display a city name which does not have any branches
+SELECT CITY_NAME FROM CITYY
+WHERE CITY_ID NOT IN (SELECT CITY_ID FROM BRANCH);
+
+4.	Display branch name, address and phone number of all the branches where the 
+            name starts with either B or M and the city name starts with either B or C.
+SELECT B_NAME,B_ADDRESS,B_PHONE
+FROM BRANCH
+WHERE (B_NAME LIKE 'B%' OR B_NAME LIKE 'M%') AND  CITY_ID IN (SELECT CITY_ID FROM CITYY
+                                                WHERE  (CITY_NAME LIKE 'B%' OR CITY_NAME LIKE 'C%'));
+5.	How many branches we have in Bangalore?
+SELECT COUNT(B_ID) FROM BRANCH 
+WHERE CITY_ID IN(SELECT CITY_ID FROM CITYY WHERE CITY_NAME='bangalore');
+6.	Display the branches which are in the Ring road of any city.
+SELECT B_NAME
+FROM BRANCH 
+WHERE B_ADDRESS LIKE '%ring road%';
+7.	Display the city name, branch name. Order the data based on the city name.
+SELECT CITY_NAME,B_NAME
+FROM CITYY C,BRANCH B
+WHERE C.CITY_ID = B.CITY_ID
+ORDER BY CITY_NAME;
+
+8.	Display the city name and the number of branches in each city.
+SELECT CITY_NAME,COUNT(B_ID)
+FROM CITYY C,BRANCH B
+WHERE C.CITY_ID = B.CITY_ID
+GROUP BY CITY_NAME;
+
+9.	Display the city name which has most number of branches.
+SELECT CITY_NAME,COUNT(B_ID)
+FROM CITYY C,BRANCH B
+WHERE C.CITY_ID = B.CITY_ID
+GROUP BY CITY_NAME
+HAVING COUNT(B_ID)=(SELECT MAX(COUNT(B_ID))
+                    FROM CITYY C,BRANCH B
+                    WHERE C.CITY_ID = B.CITY_ID
+                    GROUP BY CITY_NAME);
+10.	Display the city name, population, number of branches in each city.
+SELECT CITY_NAME,CITY_POPULATION,BR
+FROM (SELECT C.CITY_ID,COUNT(B_ID)BR
+FROM CITYY C,BRANCH B
+WHERE C.CITY_ID = B.CITY_ID
+GROUP BY C.CITY_ID)D,CITYY C1
+WHERE D.CITY_ID=C1.CITY_ID;
