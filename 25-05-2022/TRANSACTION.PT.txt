@@ -54,22 +54,82 @@ WHERE C.CUST_BKEY=A.CUST_BKEY AND A.A_NO=T.A_NO AND TXN_TYPE IN ('DEBIT','CREDIT
 GROUP BY TXN_TYPE,CUST_NAME;
 
 8.	Display city wise no of male and female customers
+select CITY,COUNT(CASE WHEN GENDER='M' THEN GENDER
+                    END)MALE_COUNT,
+            COUNT(CASE WHEN GENDER='F' THEN GENDER
+                    END)FEMALE_COUNT
+            FROM CUST_TRANSACTION
+            GROUP BY CITY;
+            
+SELECT * FROM CUST_TRANSACTION;
 
 9.	Display the customers who has only savings accout.
+SELECT CUST_NAME,count(C.CUST_BKEY)
+FROM CUST_TRANSACTION C,ACCOUNTSS A
+WHERE C.CUST_BKEY=A.CUST_BKEY
+AND ACT_TYPE='SAVINGS'
+GROUP BY CUST_NAME
+HAVING COUNT(C.CUST_BKEY)=1;
 
 10.	Display the customerwise total deposit amount and total withdraw amount
 Customer	Deposit_amt	Withdraw_amt
+SELECT CUST_NAME,SUM(CASE WHEN TXN_TYPE='DEBIT' THEN FCY_AMT
+                    END)DEPOSIT_AMT,
+                SUM(CASE WHEN TXN_TYPE='WITHDRAW' THEN FCY_AMT
+                    END)WITHDRAW_AMT
+                FROM CUST_TRANSACTION C,ACCOUNTSS A,TRANSACTION T
+WHERE C.CUST_BKEY=A.CUST_BKEY AND A.A_NO=T.A_NO
+GROUP BY CUST_NAME; 
+
 11.	Display the cities that have more number of customers than the city HYD.
-12.	Display customers who have more number of accounts than customer ‘MIKE’.
+SELECT CITY,COUNT(CUST_BKEY)
+FROM CUST_TRANSACTION
+GROUP BY CITY
+HAVING COUNT(CUST_BKEY) >(SELECT COUNT(CUST_bkey)
+FROM CUST_TRANSACTION
+WHERE CITY='BTM');
+
+12.	Display customers who have more number of accounts than customer ‘MANOJ’.
+SELECT COUNT(A_NO),CUST_NAME
+FROM ACCOUNTSS A,CUST_TRANSACTION C
+WHERE A.CUST_BKEY=C.CUST_BKEY 
+GROUP BY CUST_NAME
+HAVING COUNT(A_NO)>(SELECT COUNT(A_NO)
+                    FROM ACCOUNTSS A, CUST_TRANSACTION C
+                    WHERE A.CUST_BKEY=C.CUST_BKEY AND CUST_NAME='ASH');
+                    
 13.	Display the common customers who made transactions in the current and previous month.
-14.	Display statewise no of accounts and no of transactions in the current year.
+SELECT CUST_NAME
+FROM CUST_TRANSACTION C,ACCOUNTSS A,TRANSACTION T
+WHERE C.CUST_BKEY=A.CUST_BKEY AND A.A_NO=T.A_NO AND 
+TO_CHAR(TXN_DATE,'MM')=TO_CHAR(SYSDATE,'MM')
+INTERSECT
+SELECT CUST_NAME
+FROM CUST_TRANSACTION C,ACCOUNTSS A,TRANSACTION T
+WHERE C.CUST_BKEY=A.CUST_BKEY AND A.A_NO=T.A_NO AND 
+TO_CHAR(TXN_DATE,'MM')=TO_CHAR(SYSDATE,'MM')-1;
+
+14.	Display statewise no of accounts and no of transactions in the current year
+SELECT STATE,COUNT(A.A_NO),COUNT(T.TXN_ID)
+FROM CUST_TRANSACTION C,ACCOUNTSS A,TRANSACTION T
+WHERE C.CUST_BKEY=A.CUST_BKEY AND A.A_NO=T.A_NO
+AND TO_CHAR(TXN_DATE,'YYYY')=TO_CHAR(SYSDATE,'YYYY')
+GROUP BY STATE;
+
+SELECT * FROM TRANSACTION;
+SELECT TO_CHAR(SYSDATE,'MM')-1 FROM DUAL;
 15.	Display customers who have their email in gmail domain.
+SELECT CUST_NAME 
+FROM CUST_TRANSACTION
+WHERE EMAIL LIKE '%GMAIL%';
+
 16.	Display the youngest customer in each city.
 SELECT CUST_NAME
 FROM CUST_TRANSACTION
 WHERE (DOB,CITY) IN (SELECT MAX(DOB),CITY 
                     FROM CUST_TRANSACTION
                     GROUP BY CITY);
+                    
 17.	Display the account type wise no of customers and no of accounts opened in the current year.
 SELECT ACT_TYPE,COUNT(C.CUST_BKEY),COUNT(A.A_NO)
 FROM CUST_TRANSACTION C,ACCOUNTSS A
@@ -98,8 +158,8 @@ UPDATE CUST_TRANSACTION SET DOB='12-03-2022' WHERE CUST_BKEY=202;
 
 
 
-update emp set comm=4000 where empno=7782;
-INSERT INTO TRANSACTION VALUES(23,4157,'CREDIT',300,3000,'12-02-2022');
+update TRANSACTION set TXN_DATE='12-04-2022' where TXN_ID=5;
+INSERT INTO TRANSACTION VALUES(23,4158,'CREDIT',300,3000,'12-04-2022');
 commit;
 
 
