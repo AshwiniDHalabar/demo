@@ -1,0 +1,65 @@
+---1)Write a query to list the states and city count. Consider only states which has more than 4 cities
+SELECT * FROM BUS;
+SELECT * FROM TRIP;
+SELECT * FROM LOCATION;
+SELECT LOC_STATE,COUNT(LOC_CITY)
+FROM LOCATION
+GROUP BY LOC_STATE
+HAVING COUNT(LOC_CITY)>2;
+INSERT INTO LOCATION VALUES(105,'IN-KA-KOL','MUMBAI','INDIA',540037);
+
+
+--2)Display the bus code and registration_no for all the bus_type 'AC' 
+            or 'Sleeper' and registered in last year April month	
+INSERT INTO BUS VALUES(53,'KOL-002','KA02-9990','AC','12-04-2021');
+
+SELECT BUS_CODE,BUS_REG_NO
+FROM BUS
+WHERE BUS_TYPE IN('AC','Sleeper') and to_char(registered_on,'mm')='04' and 
+to_char(registered_on,'yyyy')=to_char(sysdate,'yyyy')-1;
+
+
+select (ADD_MONTHS(sysdate,'yy'),-4*12) from dual;
+
+---3)Display the number of buses registered in each year (DOUBT)
+                (consider only 5 years including current year)	
+                
+select COUNT(BUS_ID),TO_CHAR(registered_on,'YY')
+FROM BUS
+WHERE registered_on BETWEEN SYSDATE AND ADD_MONTHS(TRUNC(sysdate,'yy'),-4*12)
+GROUP BY TO_CHAR(registered_on,'YY');
+
+SELECT * FROM TRIP;
+SELECT TO_CHAR(SYSDATE,'WW') FROM DUAL;
+
+--4)Find all the trips we have in the current week which are starting from Bangalore
+UPDATE TRIP SET TRIP_DATE='25-05-2022' WHERE TRIP_ID=5;
+
+SELECT TRIP_ID,trip_date
+FROM TRIP T,LOCATION L
+WHERE T.FROM_LOC_ID=L.LOC_ID AND LOC_CITY='Bangalore'
+AND TO_CHAR(TRIP_DATE,'WW')=TO_CHAR(SYSDATE,'WW') and TO_CHAR(TRIP_DATE,'YY')=TO_CHAR(SYSDATE,'YY');
+
+or
+
+select trip_id, trip_date
+from trip
+where to_Char(trip_date,'ww') = to_Char(sysdate,'ww') 
+and to_Char(trip_date,'YYYY') = to_Char(sysdate,'YYYY')
+and from_loc_id = (select loc_id from location where loc_city = 'Bangalore');
+
+--5)Find all the trips where the destination is Mumbai
+SELECT TRIP_ID,TRIP_DATE
+FROM TRIP
+WHERE TO_LOC_ID IN
+(SELECT LOC_ID 
+FROM LOCATION
+WHERE LOC_CITY='MUMBAI');
+
+
+select trip_id, trip_date
+from trip inner join location
+on trip.to_loc_id = location.loc_id
+where loc_city = 'MUMBAI';
+
+UPDATE TRIP SET TO_LOC_ID=105 WHERE TRIP_ID=6;

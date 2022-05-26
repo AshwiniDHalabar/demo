@@ -1,0 +1,88 @@
+PLSQL
+Loops..
+1. Write a Plsql block to print numbers from 1 …10.
+DECLARE
+BEGIN
+FOR I IN 1..10 LOOP
+DBMS_OUTPUT.PUT_LINE(I);
+END LOOP;
+END;
+
+EXTEND
+SET SERVEROUTPUT ON
+2. Write a Plsql block to find the circumference and area of a circle.(2*pi*r, pi*r*r).
+DECLARE
+CIRCUM NUMBER(10,2);
+AREA NUMBER(10,2);
+R NUMBER;
+PI NUMBER(10,2);
+BEGIN
+R :=4;
+PI := 3.14;
+CIRCUM := 2*PI*R;
+AREA := PI*R*R;
+DBMS_OUTPUT.PUT_LINE('CIRCUMFERANCE IS '|| CIRCUM);
+DBMS_OUTPUT.PUT_LINE('AREA IS '|| AREA);
+END;
+
+3. Write a plsql block by passing 3 numbers and find the largest no. in that 3 numbers.
+CREATE OR REPLACE PROCEDURE LARGEE(A_NO INT,B_NO INT,C_NO INT)AS
+BEGIN
+IF (A_NO>B_NO) AND (A_NO>C_NO) THEN
+DBMS_OUTPUT.PUT_LINE(A_NO || ' A_NO IS GREATER');
+ELSIF (B_NO>C_NO) AND (B_NO>A_NO) THEN
+DBMS_OUTPUT.PUT_LINE(B_NO || ' B_NO IS GREATER');
+ELSE 
+DBMS_OUTPUT.PUT_LINE(C_NO || ' C_NO IS GREATER');
+END IF;
+END;
+
+EXEC LARGEE(3,10,6);
+
+  
+  
+EXEC DISPLAYY; 
+
+--4. Write a plsql block to print all the dates from first date 
+            till last date by passing year at run time.  ---
+CREATE OR REPLACE PROCEDURE LAST_DATE AS
+START_DATE DATE;
+END_DATE DATE;
+BEGIN
+START_DATE := TRUNC(SYSDATE,'YY');
+END_DATE := ADD_MONTHS(START_DATE,12)-1;
+while START_DATE<=END_DATE LOOP
+DBMS_OUTPUT.PUT_LINE(START_DATE);
+START_DATE:=START_DATE+1;
+END LOOP;
+END;
+
+EXEC LAST_DATE;
+select trunc(sysdate,'yy') from dual;
+
+SET SERVEROUTPUT ON
+---5. Write a block to print the given string vertically. Eg:Aroha
+A
+R
+O
+H
+A
+DECLARE
+STR VARCHAR2(20);
+BEGIN
+STR := 'AROHA';
+FOR I IN 1..LENGTH(STR) LOOP
+ DBMS_OUTPUT.PUT_LINE(SUBSTR(STR,I,1));
+ END LOOP;
+ END;
+ 
+--6. Write a plsql block to display the odd numbers from 1 to 50.
+CREATE OR REPLACE PROCEDURE DIS AS
+BEGIN
+FOR I IN 1..50 LOOP
+IF MOD(I,2)=1 THEN
+DBMS_OUTPUT.PUT_LINE(I);
+END IF;
+END LOOP;
+END;
+ 

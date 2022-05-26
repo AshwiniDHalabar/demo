@@ -1,0 +1,70 @@
+--LOOPING STATEMENTS IN PL/SQL--
+--Write a PL/SQL program to arrange the number of two variable in such a way that the small number 
+    will store in num_small variable and large number will store in num_large variable
+declare 
+num_large number := 6;
+num_small number := 8;
+temp number;
+begin
+if num_small >num_large then
+temp := num_small;
+num_small := num_large;
+num_large := temp;
+end if;
+dbms_output.put_line('large_no'||num_large);
+dbms_output.put_line('small_no'||num_small);
+end;
+
+set serveroutput on
+exec;
+
+--2)Write a PL/SQL program to check whether a number is even or odd.---
+declare
+num_o number := 4;
+begin
+if mod(num_o,2)=0 then
+dbms_output.put_line('even number is'||num_o);
+else 
+dbms_output.put_line('odd number is'||num_o);
+end if ;
+end;
+
+select sysdate from dual;
+
+--3)Write a PL/SQL program to check whether a date falls on weekend i.e. SATURDAY or SUNDAY.--
+declare
+date_n date := to_date('&date','dd-mon-yyyy');
+d_t varchar2(20);
+begin
+d_t := to_char(date_n,'dy');
+if d_t in ('sat','sun') then
+dbms_output.put_line('the entered date falls on'||d_t ||' weekend');
+else
+dbms_output.put_line('the entered date falls on '||d_t ||' weekday');
+end if;
+end;
+
+--Write a PL/SQL procedure to calculate the incentive achieved according to the specific sale limit.--
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE INCENTIVE(SAL NUMBER) AS
+INCEN NUMBER(20);
+BEGIN 
+IF SAL>48000 THEN
+INCEN :=400;
+ELSIF SAL>26000 THEN
+INCEN :=300;
+ELSE
+INCEN :=200;
+END IF;
+DBMS_OUTPUT.NEW_LINE;
+DBMS_OUTPUT.PUT_LINE('SALARY IS' || SAL  ||'THEN INCENTIVE IS'||INCEN);
+END;
+
+BEGIN
+INCENTIVE(2000);
+INCENTIVE(34000);
+INCENTIVE(78000);
+END;
+
+EXEC INCENTIVE(2000);
