@@ -1,0 +1,54 @@
+create table agency_src		
+(agency varchar(20),		
+program_name varchar(20),		
+fiscal_year int,		
+original_appr_amount number);	
+
+INSERT INTO AGENCY_SRC VALUES('Education','High School Grant',2005,350000);
+INSERT INTO AGENCY_SRC VALUES ('Education'	,'Middle School Grant'	,2005,	50000);
+INSERT INTO AGENCY_SRC VALUES ('Education'	,'High School Grant',	2004	,250000);
+INSERT INTO AGENCY_SRC VALUES ('DEP',	'Air',	2005,	50000);
+INSERT INTO AGENCY_SRC VALUES ('DEP',	'Air',	2004,	60000);
+INSERT INTO AGENCY_SRC VALUES ('DEP',	'Water',	2005,	70000);
+
+
+
+create table agency_tgt		
+(agency varchar(20),		
+program_name varchar(20),		
+fiscal_year int,		
+Original_appr_amount number,		
+program_amount number,		
+agency_amount number,		
+total_amount number);		
+
+
+First Visualize what is the output			
+Use any tool to generate the output			
+Use Tableau Or Power BI or SQL or TSQL to achieve the same			
+
+
+
+CREATE OR REPLACE PROCEDURE AGENCY AS
+CURSOR AGEN IS (SELECT *
+                        FROM AGENCY_SRC);
+BEGIN
+FOR I IN AGEN LOOP
+        INSERT INTO AGENCY_TGT VALUES(I.AGENCY,I.PROGRAM_NAME,I.FISCAL_YEAR,I.ORIGINAL_APPR_AMOUNT,
+        (SELECT SUM(ORIGINAL_APPR_AMOUNT) FROM AGENCY_SRC WHERE PROGRAM_NAME=I.PROGRAM_NAME),
+        (SELECT SUM(ORIGINAL_APPR_AMOUNT) FROM AGENCY_SRC WHERE AGENCY=I.AGENCY),
+        (SELECT SUM(Original_appr_amount) FROM AGENCY_SRC));
+END LOOP;
+END;
+
+SET SERVEROUTPUT ON
+EXEC AGENCY;
+
+UPDATE agency_tgt  SET PROGRAM_AMOUNT =SUM_AMT WHERE 
+
+
+SELECT * FROM AGENCY_SRC;
+SELECT * FROM AGENCY_TGT;
+SELECT (3+7) FROM DUAL;
+
+

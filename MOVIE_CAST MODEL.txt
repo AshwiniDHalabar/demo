@@ -1,0 +1,123 @@
+create table ACTOR1 (
+actor_id number(5) primary key,
+a_name varchar2(10),
+gender varchar2(10),
+dob date,
+email varchar2(30),
+phone number(12),
+city varchar2(20),
+start_date date);
+
+
+create table m_type(
+m_type_id number(5) primary key,
+m_type_desc varchar2(30));
+
+create table movie (
+m_id number(5) primary key,
+movie_name varchar2(20),
+release_date date,
+m_type_id number(5) references m_type(m_type_id));
+
+create table role1(
+role_id number(5) primary key,
+actor_id number(5)references actor1(actor_id),
+m_id number(5) references movie(movie_id),
+start_date date,
+end_date date,
+role_desc varchar2(30));
+
+INSERT INTO ACTOR1 VALUES(101,'RAMYA','F','20-03-1989','RAMYA@GMAIL.COM',8574378956,'BANGALORE','12-03-2016');
+INSERT INTO ACTOR1 VALUES(102,'NTR','M','12-03-1987','NTR2@GMAIL.COM',857437895646,'HYDERABAD','11-06-2006');
+INSERT INTO ACTOR1 VALUES(103,'DEEPIKA','F','20-08-1976','DEEPIKA@GMAIL.COM',8938573443,'MUMBAI','27-07-2008');
+INSERT INTO ACTOR1 VALUES(104,'PRAJWAL','M','20-10-1965','PRJAWAL@GMAIL.COM',8573874746,'BANGALORE','22-08-2010');
+INSERT INTO ACTOR1 VALUES(105,'MEGANA','F','20-12-1985','MEGHANA@GMAIL.COM',857437647646,'MYSORE','18-09-2003');
+INSERT INTO ACTOR1 VALUES(106,'SUDEEP','M','20-04-1974','SUDEEP@GMAIL.COM',8574308744,'HUBALI','05-10-2021');
+INSERT INTO ACTOR1 VALUES(107,'PRIYANKA','F','20-07-1988','PRIYANKA@GMAIL.COM',8574236498,'MANGALORE','11-12-2022');
+
+
+
+INSERT INTO ROLE1 VALUES(10,102,202  ,'12-03-2001','22-04-2003','HERO');
+INSERT INTO ROLE1 VALUES(11,105,  204,'12-03-2002','22-04-2005','SIDE ACTOR');
+INSERT INTO ROLE1 VALUES(12,103,206,'12-03-2007','22-04-2009','COMEDIAN');
+INSERT INTO ROLE1 VALUES(13,107,201,'12-03-2010','22-04-2012','HERO');
+INSERT INTO ROLE1 VALUES(14,101,207,'12-03-2020','22-04-2022','HEROIN');
+INSERT INTO ROLE1 VALUES(15,102, 209,'12-03-2006','22-04-2012','TWIN CHARCATOR');
+INSERT INTO ROLE1 VALUES(16,102, NULL,'12-03-2006','22-04-2022','TWIN CHARCATOR');
+
+
+
+insert into m_type values(100,'action');
+insert into m_type values(101,'thriller');
+insert into m_type values(102,'romance');
+insert into m_type values(103,'comedy');
+insert into m_type values(104,'horror');
+insert into m_type values(105,'war');
+insert into m_type values(106,'history');
+insert into m_type values(107,'documentry');
+insert into m_type values(108,'science fiction');
+insert into m_type values(109,'biographical');
+insert into m_type values(110,'sports');
+
+
+insert into movie values(200,'kgf','21-12-2018',107);
+insert into movie values(201,'rrr','10-01-2022',100);
+insert into movie values(202,'pushpa','10-07-2021',100);
+insert into movie values(203,'uturn','30-06-2016',101);
+insert into movie values(204,'vikram vedha','12-02-2018',101);
+insert into movie values(205,'drishya','01-05-2016',101);
+insert into movie values(206,'premam','18-08-2015',102);
+insert into movie values(207,'magadheera','10-04-2012',102);
+insert into movie values(208,'adyaksha','05-07-2015',103);
+insert into movie values(209,'pizza','27-05-2014',104);
+insert into movie values(210,'bahubali','10-06-2016',105);
+insert into movie values(211,'sangolli rayanna','21-10-2015',106);
+insert into movie values(212,'sachin billiob dreams','24-04-2017',107);
+insert into movie values(213,'msdhoni untold stroy','7-12-2017',109);
+insert into movie values(214,'lagaan','04-04-2001',110);
+
+
+
+
+
+select * from actor1;
+select * from role1;
+select * from m_type;
+select * from movie;
+
+
+
+
+
+
+
+
+--MOVIE CAST MODEL--
+--1.	Display the youngest actor name
+SELECT A_NAME
+FROM ACTOR1
+WHERE DOB =(SELECT MAX(DOB) 
+            FROM ACTOR1);
+--2	Display the movie name wise no of male and female actors
+SELECT MOVIE_NAME,COUNT(CASE WHEN GENDER='F' THEN GENDER
+                    END)FEMALE_A,
+                COUNT(CASE WHEN GENDER='M' THEN GENDER
+                    END)MALE_A
+                FROM ACTOR1 A,ROLE1 R,MOVIE M
+                WHERE A.ACTOR_ID=R.ACTOR_ID AND
+                    R.M_ID=M.MOVIE_ID
+                    GROUP BY MOVIE_NAME;
+                    
+
+--3.	Display the movies of type action released in the current year
+SELECT MOVIE_NAME
+FROM MOVIE  M,M_TYPE  MT
+WHERE M.M_TYPE_ID=MT.M_TYPE_ID
+AND M_TYPE_DESC='action'and TO_CHAR(RELEASE_DATE,'YYYY')=TO_CHAR(SYSDATE,'YYYY');
+
+---4.	Display all the actor names who are currently not associated with any movies
+SELECT A_NAME
+FROM ACTOR1
+WHERE ACTOR_ID  IN (SELECT ACTOR_ID
+                            FROM ROLE1
+                            WHERE M_ID IS NULL);
