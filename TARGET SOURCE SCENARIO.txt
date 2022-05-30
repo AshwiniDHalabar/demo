@@ -1,0 +1,151 @@
+--Write a procedure to populate the records from customer denormalized table to normalized tables.
+
+create table tblCstomer(
+                         cid  NUMBER (5)PRIMARY KEY,
+                         cname   varchar(20),
+                         addr    varchar(50),
+                         phone   NUMBER(15),
+                         dob     date,
+                         email   varchar(50),
+                         gender  char(2),
+                         mart_stat varchar(10),
+                         ct_name   varchar(40),
+                         st_name  varchar(60) 
+                         );
+DROP TABLE tblCustomerS;
+
+insert into tblCstomer values(CID_SRC.NEXTVAL,'Megh','BTM',8544144889,'05-02-1994','mr@gmail.com','M','unmarried','BLR','KA');
+insert into tblCstomer values(CID_SQ.NEXTVAL,'Raj','Marathalli',7903635071,'15-11-1944','rr@gmail.com','M','unmarried','BLR','KA'); 
+insert into tblCstomer values(CID_SQ.NEXTVAL,'Rakesh','e_city',8102742599,'15-01-1995','rk@gmail.com','M','married','BLR','KA');
+insert into tblCstomer values(CID_SQ.NEXTVAL,'Megha','Rameshwaram',8544144886,'05-04-1996','me@gmail.com','F','unmarried','CHN','TN');
+insert into tblCstomer values(CID_SQ.NEXTVAL,'Rani','Bodhgaya',8544144889,'25-01-2001','ra@gmail.com','F','married','CHR','AN') ;
+
+--CREATING SEQUNECE FOR TBLCUSTOMER TABLE--
+CREATE SEQUENCE CID_SRC
+START WITH 1
+INCREMENT BY 1
+MINVALUE 1
+MAXVALUE 100
+CYCLE
+CACHE 5;
+
+
+--CREATING THE TABLES--
+create table tblState(st_id NUMBER (5)primary key,st_name varchar(40));
+
+create table tblcity(ct_id NUMBER (5)primary key,
+                     ct_name varchar(40),
+                     st_id NUMBER(5)  references tblstate(st_id)) ; 
+                     
+create table tblgender2(gen_id NUMBER (5)primary key,
+                       gen char(2)) ;
+
+create table mart_stat(mart_id NUMBER(5)primary key,
+                       m_stat varchar(30)) ; 
+
+create table tblcustT(cid NUMBER,
+                     cname varchar(20),
+                     addr varchar(50),
+                     phone numeric,
+                     dob date,
+                     email varchar(50),
+                     gen_id NUMBER  references tblgender2(gen_id),
+                     mart_id NUMBER  references mart_stat(mart_id),
+                     ct_id NUMBER  references tblcity(ct_id) ) ;                 
+
+select * from tblCstomer;
+select * from tblcustT;
+select * from mart_stat;
+select * from tblgender2;
+select * from tblcity;
+select * from tblState;
+
+----SEQUENCE FOR MART-----
+CREATE SEQUENCE MART_SRC
+START WITH 200
+INCREMENT BY 1
+MINVALUE 200
+MAXVALUE 300
+CYCLE
+CACHE 5;
+
+--SEQUENCE FOR GENDER
+CREATE SEQUENCE GENDER_SRCC
+START WITH 311
+INCREMENT BY 1
+MINVALUE 311
+MAXVALUE 400
+CYCLE
+CACHE 5;
+
+--SEQUENCE FOR CITY
+CREATE SEQUENCE CITY_SRC
+START WITH 400
+INCREMENT BY 1
+MINVALUE 400
+MAXVALUE 500
+CYCLE
+CACHE 5;
+
+--SEQUENCE FOR STATE
+CREATE SEQUENCE STATE_SRC
+START WITH 500
+INCREMENT BY 1
+MINVALUE 500
+MAXVALUE 600
+CYCLE
+CACHE 5;
+
+--SEQUENCE FOR CUST
+CREATE SEQUENCE CUST_SRC
+START WITH 600
+INCREMENT BY 1
+MINVALUE 600
+MAXVALUE 700
+CYCLE
+CACHE 5;
+
+--SQL QUERY--
+INSERT INTO tblState(SELECT STATE_SRC.NEXTVAL AS ST_RC,ST_NAME 
+                                                FROM (SELECT DISTINCT ST_NAME 
+                                                        FROM tblCstomer));
+SELECT * FROM TBLSTATE;  
+
+
+INSERT INTO tblcity (SELECT CITY_SRC.NEXTVAL,CT_NAME,ST_ID
+                    FROM  (SELECT DISTINCT CT_NAME,ST_ID 
+                    FROM tblCstomer T,tblState S
+                    WHERE T.ST_NAME=S.ST_NAME));
+SELECT * FROM TBLCITY;
+
+INSERT INTO tblgender2(SELECT  GENDER_SRCC.NEXTVAL,gender 
+                FROM (SELECT DISTINCT GENDER FROM TBLCSTOMER));
+SELECT * FROM tblgender2;  
+
+
+INSERT INTO mart_stat(SELECT MART_SRC.NEXTVAL,MART_STAT
+            FROM (SELECT DISTINCT MART_STAT FROM TBLCSTOMER));
+            
+SELECT * FROM MART_STAT;
+SELECT * FROM TBLCUST;
+SELECT * FROM TBLCSTOMER;
+
+INSERT INTO tblcustT (SELECT CUST_SRC.NEXTVAL,CNAME,ADDR,PHONE,DOB,EMAIL,GEN_ID,MART_ID,CT_ID
+                FROM TBLCSTOMER T,tblgender2 G,mart_stat M,tblcity C
+                WHERE T.MART_STAT=M.M_STAT AND T.CT_NAME=C.CT_NAME AND T.GENDER=G.GEN );
+SELECT * FROM TBLCUSTT;
+
+                      
+---TO DELETE THE DUPLICATE RECORDSS----
+DELETE FROM
+  TBLCSTOMER
+WHERE
+  CID IN
+  (
+    SELECT
+      MIN(CID)
+    FROM
+      TBLCSTOMER
+    GROUP BY
+      CNAME
+      );
