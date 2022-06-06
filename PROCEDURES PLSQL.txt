@@ -1,0 +1,63 @@
+select sysdate from dual;
+
+set serveroutput on;
+
+--1. Write a procedure by passing the date and display the whether the year is leap year or not.
+
+--select to_char(sysdate,'yyyy') from dual;--
+
+create or replace procedure sp_leapyear(year date)as
+v_l number:=to_char(year,'yyyy');
+begin
+     if mod(v_l,4)=0 then 
+     dbms_output.put_line (v_l||' is leap year');
+      else 
+      dbms_output.put_line (v_l||' is not leap year');
+     end if;
+end; 
+
+exec sp_leapyear('01-jun-1982');
+
+
+
+--2. Write a procedure which takes product name and print a message if it made sales today or not?--
+
+create or replace procedure sp_prodname(product_name varchar2) as
+p_count int;
+begin
+   select count(*) into p_count
+   from product_retail p ,sales_retail s
+   where p.prod_id =s.prod_id
+   and sales_date = sysdate
+   and  p_name =product_name;
+    if p_count=0 then
+      dbms_output.put_line (product_name||' not made sale today');
+    else
+        dbms_output.put_line (product_name||' sales happend');
+    end if;
+end;  
+
+select * from product_retail;
+
+exec sp_prodname('tv');
+
+
+--3. Write a procedure which takes product name and print the no. of sales it made in the current year and in previous year.
+
+create or replace procedure sp_count_of_product(product_name varchar) as
+   v_count number;
+   v_count1 number;
+ 
+begin
+  select count(p_name) into v_count
+  from sales_retail s,product_retail p
+  where s.prod_id=p.prod_id and  p_name=product_name and to_char(sales_date,'yyyy') = to_char(sysdate,'yyyy') ;
+  dbms_output.put_line(v_count);
+ 
+  select count(p_name) into v_count1
+  from sales_retail s,product_retail p
+  where s.prod_id=p.prod_id and  p_name=product_name and to_char(sales_date,'yyyy') = to_char(sysdate,'yyyy')-1 ;
+  dbms_output.put_line(v_count1);
+  end ;
+  
+  exec sp_count_of_product('tv');

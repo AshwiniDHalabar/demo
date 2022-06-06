@@ -1,0 +1,347 @@
+PLSQL
+Loops..
+1. Write a Plsql block to print numbers from 1 …10.
+DECLARE
+BEGIN
+FOR I IN 1..10 LOOP
+DBMS_OUTPUT.PUT_LINE(I);
+END LOOP;
+END;
+
+EXTEND
+SET SERVEROUTPUT ON
+-------------------------------------------------------------------------------------
+
+2. Write a Plsql block to find the circumference and area of a circle.(2*pi*r, pi*r*r).
+DECLARE
+CIRCUM NUMBER(10,2);
+AREA NUMBER(10,2);
+R NUMBER;
+PI NUMBER(10,2);
+BEGIN
+R :=4;
+PI := 3.14;
+CIRCUM := 2*PI*R;
+AREA := PI*R*R;
+DBMS_OUTPUT.PUT_LINE('CIRCUMFERANCE IS '|| CIRCUM);
+DBMS_OUTPUT.PUT_LINE('AREA IS '|| AREA);
+END;
+
+---------------------------------------------------------------------------------------
+3. Write a plsql block by passing 3 numbers and find the largest no. in that 3 numbers.
+CREATE OR REPLACE PROCEDURE LARGEE(A_NO INT,B_NO INT,C_NO INT)AS
+BEGIN
+IF (A_NO>B_NO) AND (A_NO>C_NO) THEN
+DBMS_OUTPUT.PUT_LINE(A_NO || ' A_NO IS GREATER');
+ELSIF (B_NO>C_NO) AND (B_NO>A_NO) THEN
+DBMS_OUTPUT.PUT_LINE(B_NO || ' B_NO IS GREATER');
+ELSE 
+DBMS_OUTPUT.PUT_LINE(C_NO || ' C_NO IS GREATER');
+END IF;
+END;
+
+EXEC LARGEE(3,10,6);
+EXEC DISPLAYY; 
+
+------------------------------------------------------------------------------------------
+
+--4. Write a plsql block to print all the dates from first date 
+            till last date by passing year at run time.  ---
+CREATE OR REPLACE PROCEDURE LAST_DATE AS
+START_DATE DATE;
+END_DATE DATE;
+BEGIN
+START_DATE := TRUNC(SYSDATE,'YY');
+END_DATE := ADD_MONTHS(START_DATE,12)-1;
+while START_DATE<=END_DATE LOOP
+DBMS_OUTPUT.PUT_LINE(START_DATE);
+START_DATE:=START_DATE+1;
+END LOOP;
+END;
+
+EXEC LAST_DATE;
+select trunc(sysdate,'yy') from dual;
+
+SET SERVEROUTPUT ON
+------------------------------------------------------------------------------------
+
+---5. Write a block to print the given string vertically. Eg:Aroha
+A
+R
+O
+H
+A
+DECLARE
+STR VARCHAR2(20);
+BEGIN
+STR := 'AROHA';
+FOR I IN 1..LENGTH(STR) LOOP
+ DBMS_OUTPUT.PUT_LINE(SUBSTR(STR,I,1));
+ END LOOP;
+ END;
+ ----------------------------------------------------------------------------------
+ 
+--6. Write a plsql block to display the odd numbers from 1 to 50.
+CREATE OR REPLACE PROCEDURE DIS AS
+BEGIN
+FOR I IN 1..50 LOOP
+IF MOD(I,2)=1 THEN
+DBMS_OUTPUT.PUT_LINE(I);
+END IF;
+END LOOP;
+END;
+ 
+-----------------------------------------------------------------------------------------
+--7. Write a plsql block by passing empno and ename, insert the passed empno and 
+        ename to the table but before inserting validate it whether it is already present or not.
+        
+CREATE TABLE EMP3
+(EMPNO NUMBER(3),
+EMPNAME VARCHAR2(20),
+EMPPHONE NUMBER(10));
+
+DECLARE
+COUNT_T NUMBER;
+E_NO NUMBER;
+E_NAME VARCHAR2(20);
+BEGIN
+E_NO := 684;
+E_NAME := 'SAHIT';
+SELECT COUNT(*)  INTO COUNT_T
+FROM EMP2
+WHERE EMPNO=E_NO AND EMPNAME=E_NAME;
+IF COUNT_T =0 THEN
+INSERT INTO EMP2 VALUES(E_NO,E_NAME);
+ELSE
+DBMS_OUTPUT.PUT_LINE('RECORD ALREADY EXISTS');
+END IF;
+END;
+
+
+-----------------------------------------------------------------------------------------
+--8. Write a plsql block to print the employee details whose name starts with s or t or j or c.
+INSERT INTO EMP3 VALUES(10,'ABC',235423865);
+INSERT INTO EMP3 VALUES(20,'PQR',87328621);
+INSERT INTO EMP3 VALUES(20,'TQR',87328621);
+INSERT INTO EMP3 VALUES(20,'CQR',87328621);
+SELECT * FROM EMP3;
+SET SERVEROUTPUT ON 
+
+--USING FOR LOOP--
+DECLARE
+E_NO NUMBER;
+E_NAME VARCHAR2(20);
+E_PHONE NUMBER(10);
+CURSOR GET_DATA IS SELECT EMPNO,EMPNAME,EMPPHONE
+                        FROM EMP3
+                    WHERE EMPNAME LIKE 'S%' OR EMPNAME LIKE 'T%' OR EMPNAME LIKE 'J%' OR EMPNAME LIKE 'C%';
+BEGIN
+FOR I IN GET_DATA LOOP
+DBMS_OUTPUT.PUT_LINE(I.EMPNO || ' ' ||I.EMPNAME || ' ' ||I.EMPPHONE);
+END LOOP;
+END;
+
+--USING NORMAL---
+DECLARE
+E_NO NUMBER;
+E_NAME VARCHAR2(20);
+E_PHONE NUMBER(10);
+CURSOR GET_DATA IS SELECT EMPNO,EMPNAME,EMPPHONE
+                        FROM EMP3
+                    WHERE EMPNAME LIKE 'S%' OR EMPNAME LIKE 'T%' OR EMPNAME LIKE 'J%' OR EMPNAME LIKE 'C%';
+BEGIN
+OPEN GET_DATA;
+LOOP
+FETCH GET_DATA INTO E_NO,E_NAME,E_PHONE;
+EXIT WHEN GET_DATA%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(E_NO || ' ' ||E_NAME || ' ' ||E_PHONE);
+END LOOP;
+CLOSE GET_DATA;
+END;
+
+------------------------------------------------------------------------------------------
+--9. Write a plsql block to update the salary of an employee by giving an increment of 
+            1000 and passing the empno at runtime.---
+DECLARE
+E_NO NUMBER;
+BEGIN
+UPDATE EMP SET SAL=SAL+1000 WHERE EMPNO=&E_NO;
+END;
+
+SELECT * FROM EMP;
+---------------------------------------------------------------------------------------
+10.Write a block by passing a string and return the no. of vowels and consonants in that string.
+Eg:stationary  no.of vowels:4 no.of consonents:6
+
+DECLARE
+STR VARCHAR2(20);
+V_COUNT NUMBER;
+C_COUNT NUMBER;
+BEGIN
+V_COUNT :=0;
+C_COUNT :=0;
+STR := 'stationary';
+FOR I IN 1..LENGTH(STR) LOOP
+IF SUBSTR(STR,I,1) IN ('a','e','i','o','u') then
+v_count := v_count+1;
+else 
+c_count := c_count+1;
+end if;
+end loop;
+DBMS_OUTPUT.PUT_LINE('vowels :' ||v_count);
+DBMS_OUTPUT.PUT_LINE('consonanats : '||c_count);
+end;
+
+
+---------------------------------------------------------------------------------------
+11.Write a procedure to pass a string separated by comma like ab,abc,abcd,x,y and print the o/p as
+ab
+abc
+abcd
+x
+y
+
+create or replace procedure sp_str as
+STR VARCHAR2(20);
+VAR_COMMA_POS NUMBER(2);
+VAR_STR1 VARCHAR2(20);
+VAR_STR2 VARCHAR2(20);
+VAR_STR3 VARCHAR2(20);
+VAR_STR4 VARCHAR2(20);
+VAR_STR5 VARCHAR2(20);
+
+BEGIN
+STR := 'AB,ABC,ABCD,X,Y';
+VAR_COMMA_POS := INSTR(STR,',');
+VAR_STR1 := SUBSTR(STR,1,VAR_COMMA_POS-1);
+DBMS_OUTPUT.PUT_LINE(VAR_STR1);
+VAR_STR2 := SUBSTR(STR,4,VAR_COMMA_POS);
+DBMS_OUTPUT.PUT_LINE(VAR_STR2);
+VAR_STR3 := SUBSTR(STR,8,VAR_COMMA_POS+1);
+DBMS_OUTPUT.PUT_LINE(VAR_STR3);
+VAR_STR4 := SUBSTR(STR,13,VAR_COMMA_POS-2);
+DBMS_OUTPUT.PUT_LINE(VAR_STR4);
+VAR_STR5 := SUBSTR(STR,15,VAR_COMMA_POS);
+DBMS_OUTPUT.PUT_LINE(VAR_STR5);
+END;
+
+
+EXEC SP_STR;
+SET SERVEROUTPUT ON
+
+-----------------------------------------------------------------------------------------
+--12.Write a plsql block to print the Fibonacci series from 1 to 50. v_a=0,v
+DECLARE
+V_A NUMBER:=0;
+V_B NUMBER :=1;
+TEMP NUMBER;
+N NUMBER;
+BEGIN
+N := 5;
+DBMS_OUTPUT.PUT_LINE(V_A);
+DBMS_OUTPUT.PUT_LINE(V_B);
+FOR I IN 2..N LOOP
+TEMP := V_A+V_B;
+V_A:=V_B;
+V_B:=TEMP;
+DBMS_OUTPUT.PUT_LINE(TEMP);
+END LOOP;
+END;
+
+OR 
+DECLARE
+V_A NUMBER:=0;
+V_B NUMBER :=1;
+TEMP NUMBER;
+N NUMBER;
+BEGIN
+N := 5;
+FOR I IN 1..N LOOP
+DBMS_OUTPUT.PUT_LINE(V_A);
+TEMP := V_A+V_B;
+V_A:=V_B;
+V_B:=TEMP;
+END LOOP;
+END;
+-----------------------------------------------------------------------------------------
+-----13.Write a block to print the numbers from 1 to 10 but skip 5 an--
+DECLARE 
+BEGIN
+FOR I IN 1..10 LOOP
+IF I =5 THEN
+CONTINUE;
+ELSE 
+DBMS_OUTPUT.PUT_LINE(I);
+END IF;
+END LOOP;
+END;
+-----------------------------
+DECLARE 
+BEGIN
+FOR I IN 1..10 LOOP
+IF I !=5 THEN
+DBMS_OUTPUT.PUT_LINE(I);
+END IF;
+END LOOP;
+END;
+
+
+
+-----------------------------------------------------------------------------------------
+
+--14. Write a block to swap 2 numbers.
+DECLARE
+NUM1 NUMBER;
+NUM2 NUMBER;
+TEMP NUMBER;
+BEGIN 
+NUM1:=100;
+NUM2:=200;
+DBMS_OUTPUT.PUT_LINE('BEFORE SWAPPING');
+DBMS_OUTPUT.PUT_LINE('NUM1 IS :' ||NUM1);
+DBMS_OUTPUT.PUT_LINE('NUM2 IS :' || NUM2);
+TEMP:=NUM1;
+NUM1:=NUM2;
+NUM2:=TEMP;
+DBMS_OUTPUT.PUT_LINE('AFTER SWAPPING');
+DBMS_OUTPUT.PUT_LINE('NUM1 IS :' ||NUM1);
+DBMS_OUTPUT.PUT_LINE('NUM2 IS :' || NUM2);
+END;
+
+
+-----------------------------------------------------------------------------------------
+--15. Write a PLSQL block to display the given number is prime or not.
+DECLARE
+N NUMBER;
+I NUMBER;
+FLAG NUMBER;
+BEGIN
+I:=2;
+N :=9;
+FLAG:=1;
+FOR I IN 2..N/2 LOOP
+IF MOD(N,I)=0 THEN
+FLAG:=0;
+EXIT;
+END IF;
+END LOOP;
+IF FLAG=1 THEN
+DBMS_OUTPUT.PUT_LINE('PRIME NUMBER');
+ELSE 
+DBMS_OUTPUT.PUT_LINE('NOT A PRIME NUMBER');
+END IF ;
+END;
+
+SET SERVEROUTPUT ON
+
+
+---------------------------------------------------------------------------------------
+--16.Write a plsql block by passing a empno so that the salary of the prior employee 
+    should incremented by 1000 and next employee salary should be decremented by 1000.
+DECLARE
+EMP_NO NUMBER(10);
+BEGIN
+EMP_NO := 7369;
+UPDATE EMP SET SAL=SAL+1000 WHERE EMPNO=EMP_NO;
+UPDATE EMP SET SAL=SAL-1000 WHERE ROWNUM=7;
+END;
