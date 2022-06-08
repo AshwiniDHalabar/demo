@@ -1,0 +1,96 @@
+--Write a procedure to populate the date dimension table by passing the YEAR from procedure.
+    All the records of that year should be populated means from the first day till the last day 
+    of the year. Before inserting check whether the 
+    records of that year is already populated or not.----
+
+
+Name                Null Type         
+------------------- ---- ------------ 
+DATE_KEY                 number(10) --This should be in YYYYMMDD format
+ACCURATE_DATE            DATE         
+DAY_NUMBER_OF_WEEK       NUMBER(10)   
+DAY_NUMBER_OF_MONTH      NUMBER(10)   
+DAY_NUMBER_OF_YEAR       NUMBER(10)   
+WEEK_NO_OF_MONTH         NUMBER(10)   
+WEEK_NO_YEAR             NUMBER(10)   
+MONTH_NO                 NUMBER(10)   
+MONTH_SHORT_NAME         VARCHAR2(40) 
+MONTH_FULL_NAME          VARCHAR2(40) 
+QTR_NO                   NUMBER(10)   
+SEMESTER_NO              NUMBER(10)   
+CALENDER_YEAR            NUMBER(10)   
+FISCAL_MONTH             NUMBER(10)   
+FISCAL_WEEK              NUMBER(10)   
+FISCAL_QTR               NUMBER(10)   
+FISCAL_YEAR              VARCHAR2(20) 
+WEEK_DAY_FLAG            VARCHAR2(20) 
+
+
+
+create table date_dimension1
+(DATE_KEY int ,
+ACCURATE_DATE date,
+DAY_NUMBER_OF_WEEK int,
+DAY_NUMBER_OF_MONTH int,
+DAY_NUMBER_OF_YEAR int,
+WEEK_NO_OF_MONTH int,
+WEEK_NO_YEAR int,
+MONTH_NO int,
+MONTH_SHORT_NAME varchar(20),
+MONTH_FULL_NAME varchar(20),
+QTR_NO int,
+SEMESTER_NO int,
+CALENDER_YEAR NUMBER(10),
+WEEK_DAY_FLAG varchar2(10));
+
+
+CREATE OR REPLACE PROCEDURE SP_DIMENSION(V_YEAR VARCHAR2)AS
+START_DATE DATE;
+END_DATE DATE;
+VAL_ERROR EXCEPTION;
+V_COUNT NUMBER;
+INVALID_DATATYPE EXCEPTION;
+PRAGMA EXCEPTION_INIT(INVALID_DATATYPE,-01841);
+BEGIN
+START_DATE := TRUNC(TO_DATE(V_YEAR,'YY'),'YY');
+END_DATE := ADD_MONTHS(START_DATE,12)-1;
+WHILE START_DATE<=END_DATE LOOP
+INSERT INTO DATE_DIMENSION1  
+(SELECT SEQ_DATE.NEXTVAL,START_DATE ,
+    TO_CHAR(START_DATE,'D'),
+    TO_CHAR(START_DATE,'DD'),
+    TO_CHAR(START_DATE,'DDD'),
+    TO_CHAR(START_DATE,'W'),
+    TO_CHAR(START_DATE,'WW'),
+    TO_CHAR(START_DATE,'MM'),
+    TO_CHAR(START_DATE,'MON'),
+    TO_CHAR(START_DATE,'MONTH'),
+    TO_CHAR(START_DATE,'Q'),
+    CASE 
+    WHEN TO_CHAR(SYSDATE,'MM') BETWEEN 1 AND 6 THEN 1
+    ELSE 2
+    END SEMESTERNO,
+    TO_CHAR(SYSDATE,'YYYY'),
+    CASE
+    WHEN TO_CHAR(SYSDATE,'D') IN (2,3,4,5,6) THEN 'WEEKDAY'
+    ELSE 'WEEKEND'
+    END WEEK_DAY_FLAG 
+FROM DUAL);
+START_DATE := START_DATE + 1;
+END LOOP;
+RAISE VAL_ERROR;
+EXCEPTION
+WHEN VAL_ERROR THEN
+DBMS_OUTPUT.PUT_LINE('INVALID CREDENTIALS');
+WHEN INVALID_DATATYPE THEN
+DBMS_OUTPUT.PUT_LINE(SQLCODE || ' '|| SQLERRM);
+END;
+
+EXEC SP_DIMENSION('ABC');
+
+SET SERVEROUTPUT ON
+
+----CREATING A SEQUENCE-----
+CREATE SEQUENCE SEQ_DATE;
+SELECT * FROM DATE_DIMENSION1;
+TRUNCATE TABLE DATE_DIMENSION1;
