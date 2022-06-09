@@ -1,0 +1,115 @@
+---Assume we work for any retail giant in any country, they must be having system where 
+    they have both store wise sales system and ecommerce system where they sell the products online.
+    Assume we have product table of store, its called as s_product and there is a product table called
+    o_product for online sales application.--
+
+
+As management wants to consolidate the products for reporting purpose, we created the one version of product information for easy access and analysis.
+Product_master
+
+P_id	Sku_id	P_name	P_cost	Store_price	Online_price	P_code	Launch_dt
+
+You have to populate the prod_master table. Business rules are
+1.	Unique records between two systems are identified based on the SKU ID
+2.	If the names are different for the specific SKU between store and online product, then consider s_p_name from s_product table to populate the master table.
+3.	If cost of the product is different in both systems, then consider the highest one as the p_cost
+4.	Populate the p_code in the target only if that product comes from store product table
+5.	Populate the launch_dt in the target only if that product comes from online product table.
+
+
+Create table store_product
+(s_prod_id number,
+S_p_code varchar2(20),
+S_p_name varchar(20),
+Sku_id number,
+Cost number,
+Price number
+);
+
+
+insert into store_product values(1101,'A1234','laptop',9456,30000,32000);
+insert into store_product values(1102,'A1235','headphone',9457,5000,4000);
+insert into store_product values(1103,'A1236','monitor',9458,1000,2000);
+insert into store_product values(1104,'A1237','earphone',9459,500,600);
+insert into store_product values(1105,'A1238','cpu',9460,6000,7000);
+
+Create table online_product
+(o_prod_id number,
+prod_name varchar(20),
+Sku_id number,
+Online_Price number,
+discount number,
+Online_cost number,
+Launch_dt date
+);
+
+insert into online_product values(1501,'Dell laptop',9456,35000,1000,40000,'21-jun-19');
+insert into online_product values(1502,'headphone',9457,4000,500,3000,'11-mar-19');
+insert into online_product values(1503,'Chair',9461,2000,200,1500,'13-jan-19');
+insert into online_product values(1504,'Table',9462,8000,1200,7000,'26-feb-19');
+insert into online_product values(1505,'Sofa',9463,70000,5000,75000,'09-sep-19');
+
+Create table product_master
+(p_id number,
+Sku_id number,
+P_name varchar(20),
+P_cost number, 
+Store_price number,
+Online_price number,
+P_code varchar2(20),
+Launch_date date
+);
+
+SELECT * FROM STORE_PRODUCT;
+SELECT * FROM ONLINE_PRODUCT;
+
+
+create or replace procedure sp_pO_store as
+cursor cur_get_store is
+SELECT *
+FROM STORE_PRODUCT FULL JOIN ONLINE_PRODUCT 
+ON  STORE_PRODUCT.SKU_ID = ONLINE_PRODUCT.SKU_ID;
+v_count number:=0;
+begin
+for i in cur_get_store loop
+select count(*) into v_count
+from product_master
+where sku_id=i.sku_id or sku_id=i.sku_id1;
+if v_count=0 then 
+insert into product_master values(pos.nextval,i.sku_id,i.p_name,i.p_cost,i.store_price,i.online_price,i.p_code,i.launch_date);
+end if;
+end loop;
+end;
+
+CREATE OR REPLACE PROCEDURE SP_PRO_MERG AS
+CURSOR GET_PRO_MERG IS SELECT * FROM STORE_PRODUCT;
+CURSOR GET_PRO_MERG1 IS SELECT * FROM ONLINE_PRODUCT;
+V_COUNT NUMBER;
+V_COUNT1 NUMBER;
+BEGIN
+FOR I IN GET_PRO_MERG LOOP
+SELECT COUNT(*) INTO V_COUNT 
+FROM PRODUCT_MASTER
+WHERE SKU_ID=I.SKU_ID;
+IF V_COUNT = 0 THEN
+INSERT INTO PRODUCT_MASTER (P_ID,SKU_ID,P_NAME,P_COST,STORE_PRICE,P_CODE)
+        VALUES(SEQ_PRODUCT.NEXTVAL,I.SKU_ID,I.S_P_NAME,I.COST,I.PRICE,I.S_P_CODE);
+END IF;
+END LOOP;
+FOR J IN GET_PRO_MERG1 LOOP
+SELECT COUNT(*) INTO V_COUNT1
+FROM PRODUCT_MASTER
+WHERE SKU_ID=J.SKU_ID;
+IF V_COUNT1=0 THEN
+INSERT INTO PRODUCT_MASTER(P_ID,SKU_ID,P_NAME,ONLINE_PRICE,LAUNCH_DATE)
+        VALUES(SEQ_PRODUCT.NEXTVAL,J.SKU_ID,J.PROD_NAME,J.ONLINE_PRICE,J.LAUNCH_DT);
+ELSE
+UPDATE PRODUCT_MASTER SET ONLINE_PRICE=J.ONLINE_PRICE WHERE SKU_ID=J.SKU_ID;
+UPDATE PRODUCT_MASTER SET LAUNCH_DATE=J.LAUNCH_DT WHERE SKU_ID=J.SKU_ID;
+UPDATE PRODUCT_MASTER SET P_COST=J.ONLINE_COST WHERE SKU_ID=J.SKU_ID AND P_COST<J.ONLINE_COST;
+COMMIT;
+END IF;
+END LOOP;
+END;
+
+exec sp_pro_merg;
