@@ -1,0 +1,43 @@
+create table store_sales1
+(store varchar2(20),
+product varchar2(20),
+sales NUMBER(4));
+
+DROP TABLE STORE_SALES;
+insert into store_sales1 values('s1','tv',456);
+insert into store_sales1 values('s1','tv',654);
+insert into store_sales1 values('s1','tv',849);
+insert into store_sales1 values('s2','tv',849);
+insert into store_sales1 values('s2','tv',345);
+insert into store_sales1 values('s2','mouse',45);
+insert into store_sales1 values('s2','dvd',213);
+
+SELECT * FROM STORE_SALES1;
+ALTER TABLE STORE_SALES1 ADD CRT_DATE DATE;
+
+1.	Write a trigger to populate the crt_date automatically when any process inserts 
+    record into store_sales table.
+    
+CREATE OR REPLACE TRIGGER T_STORE_SALES
+BEFORE INSERT 
+ON STORE_SALES1
+FOR EACH ROW 
+BEGIN
+    IF INSERTING THEN
+        :NEW.CRT_DATE:=SYSDATE;
+    END IF;
+END;
+
+TRUNCATE TABLE STORE_SALES;
+UPDATE STORE_SALES1 SET PRODUCT='MOBILE' WHERE STORE='s1';
+    INSERT INTO STORE_SALES1 VALUES('S4','FRIDGE',278,NULL);
+
+--Write a stored procedure to populate the  store summary based on the above store_sales table. We gave the sample records for the sa
+    me. You have to consider any product which is other than ‘TV’ and ‘DVD’ as others.
+    
+---USING SQL---
+SELECT STORE,AVG(CASE WHEN PRODUCT='tv' THEN SALES END) SALES,
+            AVG(CASE WHEN PRODUCT='dvd' THEN SALES END) SALES,
+            AVG(CASE WHEN PRODUCT='mouse' THEN SALES END) OTHERS
+FROM STORE_SALES1
+GROUP BY STORE;
